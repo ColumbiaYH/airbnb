@@ -143,17 +143,17 @@ airbnbdata1$accommodates=as.numeric(airbnbdata1$accommodates)
 airbnbdata1=filter(airbnbdata1,beds>0 & beds<20)
 
 #Mean price VS bedrooms
-    grouped1 = airbnbdata1 %>% group_by(bedrooms) %>% summarise(meana = mean(as.numeric(price), na.rm = T))
+    grouped1 = airbnbdata1 %>% group_by(bedrooms) %>% summarise(mean_price = mean(as.numeric(price), na.rm = T))
     grouped1=na.omit(grouped1)
     Numberofbedrooms <- grouped1$bedrooms
-    MeanPrice <- grouped1$meana
+    MeanPrice <- grouped1$mean_price
     ggplot(grouped1, aes(x =Numberofbedrooms, y = MeanPrice), colour = 'red') + geom_bar(stat = 'identity')
     
 #Mean Price VS people 
-    grouped2 = airbnbdata1 %>% group_by(accommodates) %>% summarise(meana = mean(as.numeric(price), na.rm = T))
+    grouped2 = airbnbdata1 %>% group_by(accommodates) %>% summarise(mean_price = mean(as.numeric(price), na.rm = T))
     grouped2=na.omit(grouped2)
     Numberofpeople <- grouped2$accommodates
-    MeanPrice <- grouped2$meana
+    MeanPrice <- grouped2$mean_price
     ggplot(grouped2, aes(x =Numberofpeople, y = MeanPrice), colour = 'red') + geom_bar(stat = 'identity')
     
  #price rate per person
