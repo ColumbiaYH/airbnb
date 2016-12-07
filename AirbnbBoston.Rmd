@@ -3,7 +3,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-##
+#Load Libraries
 ```{r,warning=FALSE,message=FALSE}
 #load libraries
 library(dplyr)
@@ -21,7 +21,7 @@ library(wordcloud)
 library(shiny)
 ```
 
-#read file
+#Read Files
 ```{r,eval=FALSE}
 setwd("C:/Users/He Yu/Downloads")
 airbnb = read_csv(file="Datasets/calendar.csv")
@@ -29,19 +29,14 @@ airbnb16 = filter(airbnb,date=="Jan-16" | date=="Feb-16" | date=="Mar-16" | date
 airbnb16$price=as.numeric(airbnb16$price)
 #View(airbnb16)
 ```
-#plot line graph about the monthly average 
-#price in a whole year
+#Trend of the average price variation in 2016
 ```{r,message=FALSE}
 #monthly average price
 mon_avg<-NULL
 mon_avg1 = airbnb16%>%group_by(date)%>%summarise(price=mean(price, na.rm=T))
-#Monthly average price distribution
-##plot(1:12,mon_avg,xaxt="n",main="Monthly average price of Boston on Airbnb",xlab="Month",ylab="Average price")
-##axis(1,labels=Mon,at=1:12,las=1) 
-#mon_avg$date1<-factor(mon_avg$date,levels = c("Jan-16","Feb-16","Mar-16","Apr-16","May-16","Jun-16","Jul-16","Aug-16","Sep-16","Oct-16","Nov-16","Dec-16"))
+#plot the point graph with fitting line
 mon_avg1[1:12,1]=c("Apr","Aug","Dec","Feb","Jan","Jul","Jun","Mar","May","Nov","Oct","Sep")
 mon_avg=mon_avg1
-#a=mon_avg[c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"),]
 mon_avg[1,]=mon_avg1[5,]
 mon_avg[2,]=mon_avg1[4,]
 mon_avg[3,]=mon_avg1[8,]
@@ -58,8 +53,7 @@ mon_avg$date <- factor(mon_avg$date, levels=unique(mon_avg$date))
 ggplot(data=mon_avg, mapping = aes(date, price,group=1)) + 
   geom_smooth(se=F, color="blue")+geom_point()+ylim(180,260)+labs(title="Trend of the average price in 2016 for Airbnb in Boston")
 ```
-#plot histogram of the monthly average price 
-#in busy month(Oct), leisure month(Feb) and Regular month(Jun), respectively
+#Comparison of the Average price distribution among Oct, Feb and Jun 
 ```{r,warning=FALSE}
 #compute the monthly average price in Oct, Feb and Jun
 airbnb_Oct=filter(airbnb16,date=="Oct-16")
@@ -70,7 +64,7 @@ Avg_Feb=airbnb_Feb%>%group_by(listing_id)%>%summarise(meanp=mean(price, na.rm=T)
 #do similar process for Jun
 airbnb_Jun=filter(airbnb16,date=="Jun-16")
 Avg_Jun=airbnb_Jun%>%group_by(listing_id)%>%summarise(meanp=mean(price, na.rm=T))
-##plot the histgram
+##plot the histogram respectively
 d <- ggplot(Avg_Oct, aes(meanp, fill =..count..))
 d + geom_histogram(bins = 20)+
   labs(x = "Average price of October", title = "Average price distribution in October")+
@@ -83,7 +77,7 @@ d <- ggplot(Avg_Jun, aes(meanp, fill =..count..))
 d + geom_histogram(bins = 20)+
   labs(x = "Average price of June", title = "Average price distribution in June")+
   ylim(0,400)
-#to have all three months shown on a single plot
+#to have all three months shown on a single boxplot and histogram
 merged.avg=rbind(Avg_Feb, Avg_Jun, Avg_Oct)
 merged.avg$month=c(rep("Feb", nrow(Avg_Feb)),
                    rep("Jun", nrow(Avg_Jun)),
@@ -102,7 +96,7 @@ ggplot(data = merged.avg[!is.na(merged.avg$meanp),]) +
        x = "Month")
 
 ```
-##map 
+##Mapping out the price distribution in Suffolk City, Boston 
 ```{r}
 #read the original list
 setwd("C:/Users/He Yu/Downloads")
@@ -134,6 +128,7 @@ zip_choropleth(Avg_loc,
                legend="mean price")
 ```
 
+#Relationship between the price and the condition of the sites 
 ```{r,message=FALSE,warning=FALSE}
 setwd("C:/Users/He Yu/Downloads")
 airbnbdata = read_csv(file="Datasets/listings.csv")
@@ -147,7 +142,7 @@ airbnbdata1$beds=as.numeric(airbnbdata1$beds)
 airbnbdata1$accommodates=as.numeric(airbnbdata1$accommodates)
 airbnbdata1=filter(airbnbdata1,beds>0 & beds<20)
 
- #Mean price VS bedrooms
+#Mean price VS bedrooms
     grouped1 = airbnbdata1 %>% group_by(bedrooms) %>% summarise(meana = mean(as.numeric(price), na.rm = T))
     grouped1=na.omit(grouped1)
     Numberofbedrooms <- grouped1$bedrooms
@@ -169,7 +164,7 @@ airbnbdata1=filter(airbnbdata1,beds>0 & beds<20)
     lines(table)
 ```
 
-##word cloud
+##Word cloud to see what do customers and the host care about the residence
 ```{r}
 setwd("C:/Users/He Yu/Downloads")
 guestsanalysis = read_csv(file="Datasets/reviews.csv")
@@ -209,6 +204,7 @@ guests <- Corpus(VectorSource(guestsanalysis$comments))
 
 ```
 
+#A shiny app to see the condition of the sites provided by Airbnb in Boston
 ```{r}
 shinyApp(
 #ui
